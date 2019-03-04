@@ -41,12 +41,13 @@ namespace mrcpp {
     npts:	    points in each direction, default 1000
     *b:			upper bound, default (0, 0, ... , 0)
     *a:			lower bound, default (0, 0, ... , 0)
+    *o:			origin, default (0, 0, ... , 0)
 */
-template <int D>
-Plotter<D>::Plotter(int npts, const double *a, const double *b)
-        : fout(0)
-        , nPoints(npts) {
-    setRange(a, b);
+template<int D>
+Plotter<D>::Plotter(int npts, const double *a, const double *b, const double *o)
+        : fout(0),
+          nPoints(npts) {
+    setRange(a, b, o);
     setSuffix(Plotter<D>::Line, ".line");
     setSuffix(Plotter<D>::Surface, ".surf");
     setSuffix(Plotter<D>::Cube, ".cube");
@@ -60,8 +61,10 @@ Plotter<D>::Plotter(int npts, const double *a, const double *b)
     Arguments:
     *a:			lower bound, default (0, 0, ... , 0)
     *b:			upper bound, default (0, 0, ... , 0)
+    *o:			origin, default (0, 0, ... , 0)
 */
-template <int D> void Plotter<D>::setRange(const double *a, const double *b) {
+template<int D>
+void Plotter<D>::setRange(const double *a, const double *b, const double *o) {
     for (int d = 0; d < D; d++) {
         if (a == nullptr) {
             A[d] = 0.0;
@@ -72,6 +75,11 @@ template <int D> void Plotter<D>::setRange(const double *a, const double *b) {
             B[d] = 0.0;
         } else {
             B[d] = b[d];
+        }
+        if (o == nullptr) {
+            O[d] = 0.0;
+        } else {
+            O[d] = o[d];
         }
     }
 }

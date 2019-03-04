@@ -38,10 +38,10 @@ namespace mrcpp {
 
 template <int D> class Plotter {
 public:
-    Plotter(int npts = 1000, const double *a = 0, const double *b = 0);
+    Plotter(int npts = 1000, const double *a = nullptr, const double *b = nullptr, const double *o = nullptr);
     virtual ~Plotter() = default;
 
-    void setRange(const double *a, const double *b);
+    void setRange(const double *a, const double *b, double *o-);
     void setNPoints(int npts);
     void setSuffix(int t, const std::string &s);
 
