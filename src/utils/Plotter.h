@@ -41,7 +41,7 @@ public:
     Plotter(int npts = 1000, const double *a = nullptr, const double *b = nullptr, const double *o = nullptr);
     virtual ~Plotter() = default;
 
-    void setRange(const double *a, const double *b, double *o-);
+    void setRange(const double *a, const double *b, const double *o);
     void setNPoints(int npts);
     void setSuffix(int t, const std::string &s);
 
@@ -66,6 +66,7 @@ protected:
     int nPoints;
     double A[D]; ///< lower left corner
     double B[D]; ///< upper right corner
+    double O[D]; ///< upper right corner
     std::map<int, std::string> suffix;
     Eigen::MatrixXd coords;
     Eigen::VectorXd values;

@@ -200,7 +200,7 @@ template <int D> void Plotter<D>::linePlot(FunctionTree<D> &tree, const std::str
 */
 template <int D> void Plotter<D>::surfPlot(FunctionTree<D> &tree, const std::string &fname) {
     println(20, "--------Surface Plot----------");
-    if (not verifyRange()) MSG_ERROR("Zero range");
+    //    if (not verifyRange()) MSG_ERROR("Zero range");
     calcSurfCoordinates();
     evaluateFunction(tree);
     std::stringstream file;
@@ -310,29 +310,31 @@ template <int D> void Plotter<D>::calcLineCoordinates() {
 }
 
 template <int D> void Plotter<D>::calcSurfCoordinates() {
-    NOT_IMPLEMENTED_ABORT;
-    //    if (D != 2) {
-    //        MSG_ERROR("Cannot plot planes for dim != 2!");
-    //        return;
-    //    }
+    if(D < 2) {
+        NOT_IMPLEMENTED_ABORT;
+    }
+    int nPerDim = (int) std::floor(std::sqrt(this->nPoints));
+    int nRealPoints = math_utils::ipow(nPerDim, 2); 
+    this->coords = MatrixXd::Zero(nRealPoints, D);
 
-    //    int nPerDim = (int) std::floor(std::sqrt(this->nPoints));
-    //    int nRealPoints = math_utils::ipow(nPerDim, 2);
-    //    this->coords = MatrixXd::Zero(nRealPoints, 2);
+    double step_a[D];
+    double step_b[D];
+    for (int d = 0; d < D; d++) {
+        step_a[d] = this->A[d] / (nPerDim + 1);
+        step_b[d] = this->B[d] / (nPerDim + 1);
+    }
 
-    //    double step[2];
-    //    for (int d = 0; d < D; d++) {
-    //        step[d] = (this->B[d] - this->A[d]) / (nPerDim + 1);
-    //    }
-
-    //    int n = 0;
-    //    for (int i = 1; i <= nPerDim; i++) {
-    //        for (int j = 1; j <= nPerDim; j++) {
-    //            this->coords(n, 0) = i * step[0] + this->A[0];
-    //            this->coords(n, 1) = j * step[1] + this->A[1];
-    //            n++;
-    //        }
-    //    }
+    int n = 0;
+    for (int i = 1; i <= nPerDim; i++) {
+        for (int j = 1; j <= nPerDim; j++) {
+            for (int k = 0; k < D; k++) {
+                this->coords(n, k) = this->O[k]
+                                   + i * step_a[k]
+                                   + j * step_b[k];
+            }
+            n++;
+        }
+    }
 }
 
 // Specialized for D=3 below
@@ -404,7 +406,19 @@ template <int D> void Plotter<D>::writeLineData() {
 }
 
 template <int D> void Plotter<D>::writeSurfData() {
-    NOT_IMPLEMENTED_ABORT
+    if(D < 2) {
+        NOT_IMPLEMENTED_ABORT;
+    }
+    int totNPoints = this->coords.rows();
+    std::ostream &o = *this->fout;
+    for (int i = 0; i < totNPoints; i++) {
+        o.precision(8);
+        o.setf(std::ios::showpoint);
+        for (int d = 0; d < D; d++) { o << this->coords(i, d) << " "; }
+        o.precision(12);
+        o << this->values[i];
+        o << std::endl;
+    }
 }
 
 // Specialized for D=3 below
